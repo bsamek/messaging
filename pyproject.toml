@@ -18,4 +18,5 @@ slack-codex-bridge = "slack_codex_bridge.app:main"
 [dependency-groups]
 dev = [
   "pytest>=8.0.0,<9.0.0",
+  "pytest-cov>=7.0.0",
 ]
