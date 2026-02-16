@@ -104,8 +104,6 @@ Create a plist file with your specific configuration:
         <string>your-app-token</string>
         <key>SLACK_BOT_TOKEN</key>
         <string>your-bot-token</string>
-        <key>SLACK_SIGNING_SECRET</key>
-        <string>your-signing-secret</string>
         <!-- Add other env vars from .envrc -->
     </dict>
 

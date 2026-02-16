@@ -194,7 +194,6 @@ slack_codex_bridge/
 ```bash
 SLACK_APP_TOKEN=xapp-...
 SLACK_BOT_TOKEN=xoxb-...
-SLACK_SIGNING_SECRET=...    # optional in pure Socket Mode, keep for compatibility
 
 CODEX_BIN=codex
 CODEX_ARGS=
