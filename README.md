@@ -59,8 +59,22 @@ export ALLOWED_CHANNEL_IDS=""
 uv run slack-codex-bridge
 ```
 
+## Development
+
+Install the pre-commit hook to run tests automatically before each commit:
+
+```bash
+uv run pre-commit install
+```
+
 ## Testing
 
 ```bash
 uv run pytest
+```
+
+To run tests with coverage (CI enforces 100%):
+
+```bash
+uv run pytest --cov=slack_codex_bridge --cov-report=term-missing --cov-fail-under=100
 ```
