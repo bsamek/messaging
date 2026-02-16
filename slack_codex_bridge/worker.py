@@ -79,7 +79,7 @@ class JobWorker:
                 try:
                     self._queue.put_nowait(None)
                     break
-                except queue.Full:
+                except queue.Full:  # pragma: no cover - race condition fallback
                     time.sleep(0.01)
         if wait:
             for thread in self._threads:
@@ -122,7 +122,7 @@ class JobWorker:
         while not self._stop_event.is_set():
             try:
                 item = self._queue.get(timeout=0.25)
-            except queue.Empty:
+            except queue.Empty:  # pragma: no cover - timeout loop fallback
                 continue
 
             if item is None:

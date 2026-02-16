@@ -161,7 +161,7 @@ def create_app(
     return app, worker, service
 
 
-def main() -> None:
+def main() -> None:  # pragma: no cover
     from slack_bolt.adapter.socket_mode import SocketModeHandler
 
     logging.basicConfig(
@@ -179,5 +179,5 @@ def main() -> None:
         worker.stop()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
