@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import hashlib
 import json
 import logging
 import queue
@@ -27,14 +26,6 @@ class CodexJob:
     run_fn: RunFn | None = None
 
 
-@dataclass
-class WorkerMetrics:
-    jobs_received_total: int = 0
-    jobs_completed_total: int = 0
-    jobs_failed_total: int = 0
-    jobs_timeout_total: int = 0
-
-
 class JobWorker:
     def __init__(
         self,
@@ -57,8 +48,6 @@ class JobWorker:
         self._stop_event = threading.Event()
         self._threads: list[threading.Thread] = []
         self._logger = logger or logging.getLogger(__name__)
-        self._metrics = WorkerMetrics()
-        self._metrics_lock = threading.Lock()
 
     def start(self) -> None:
         if self._threads:
@@ -92,31 +81,18 @@ class JobWorker:
         except queue.Full:
             return False
 
-        with self._metrics_lock:
-            self._metrics.jobs_received_total += 1
-
         self._log_event(
             "job_enqueued",
             job_id=job.job_id,
             user_id=job.user_id,
             channel_id=job.channel_id,
             prompt_len=len(job.prompt),
-            prompt_hash=hashlib.sha256(job.prompt.encode("utf-8")).hexdigest()[:12],
             queue_depth=self._queue.qsize(),
         )
         return True
 
     def queue_depth(self) -> int:
         return self._queue.qsize()
-
-    def metrics(self) -> WorkerMetrics:
-        with self._metrics_lock:
-            return WorkerMetrics(
-                jobs_received_total=self._metrics.jobs_received_total,
-                jobs_completed_total=self._metrics.jobs_completed_total,
-                jobs_failed_total=self._metrics.jobs_failed_total,
-                jobs_timeout_total=self._metrics.jobs_timeout_total,
-            )
 
     def _worker_loop(self) -> None:
         while not self._stop_event.is_set():
@@ -150,8 +126,6 @@ class JobWorker:
                 )
                 self._send_response(job, message)
                 status = "completed"
-                with self._metrics_lock:
-                    self._metrics.jobs_completed_total += 1
             else:
                 error_type = result["error_type"] or "internal_error"
                 message = format_failure(
@@ -160,10 +134,8 @@ class JobWorker:
                     error_detail=result["error_detail"],
                 )
                 self._send_response(job, message)
-                self._record_failure(error_type)
         except Exception as exc:  # pragma: no cover - defensive fallback
             error_type = "internal_error"
-            self._record_failure(error_type)
             self._send_response(
                 job,
                 format_failure(
@@ -183,12 +155,6 @@ class JobWorker:
             duration_ms=duration_ms,
             queue_depth=self._queue.qsize(),
         )
-
-    def _record_failure(self, error_type: str) -> None:
-        with self._metrics_lock:
-            self._metrics.jobs_failed_total += 1
-            if error_type == "timeout":
-                self._metrics.jobs_timeout_total += 1
 
     def _send_response(self, job: CodexJob, message: str) -> None:
         try:

@@ -92,7 +92,6 @@ class SettingsFromEnvTests(unittest.TestCase):
         env = {
             "SLACK_APP_TOKEN": "xapp-test",
             "SLACK_BOT_TOKEN": "xoxb-test",
-            "SLACK_SIGNING_SECRET": "secret123",
             "CODEX_BIN": "/usr/bin/codex",
             "CODEX_ARGS": "--flag1 --flag2",
             "CODEX_TIMEOUT_SECONDS": "120",
@@ -112,7 +111,6 @@ class SettingsFromEnvTests(unittest.TestCase):
 
         self.assertEqual(settings.slack_app_token, "xapp-test")
         self.assertEqual(settings.slack_bot_token, "xoxb-test")
-        self.assertEqual(settings.slack_signing_secret, "secret123")
         self.assertEqual(settings.codex_bin, "/usr/bin/codex")
         self.assertEqual(settings.codex_args, ("--flag1", "--flag2"))
         self.assertEqual(settings.codex_timeout_seconds, 120)
@@ -169,7 +167,6 @@ class SettingsToRunnerConfigTests(unittest.TestCase):
         settings = Settings(
             slack_app_token="xapp-test",
             slack_bot_token="xoxb-test",
-            slack_signing_secret="secret",
             codex_bin="/bin/codex",
             codex_args=("--arg1",),
             codex_timeout_seconds=120,
@@ -196,7 +193,6 @@ class SettingsToRunnerConfigTests(unittest.TestCase):
         settings = Settings(
             slack_app_token="xapp-test",
             slack_bot_token="xoxb-test",
-            slack_signing_secret="secret",
             codex_bin="/bin/codex",
             codex_args=("--arg1",),
             codex_timeout_seconds=120,

@@ -30,7 +30,6 @@ def _parse_csv_set(value: str | None) -> frozenset[str]:
 class Settings:
     slack_app_token: str
     slack_bot_token: str
-    slack_signing_secret: str
     codex_bin: str
     codex_args: tuple[str, ...]
     codex_timeout_seconds: int
@@ -57,7 +56,6 @@ class Settings:
 
         slack_app_token = source.get("SLACK_APP_TOKEN", "").strip()
         slack_bot_token = source.get("SLACK_BOT_TOKEN", "").strip()
-        slack_signing_secret = source.get("SLACK_SIGNING_SECRET", "").strip()
 
         if require_slack_tokens and not slack_app_token:
             raise ValueError("SLACK_APP_TOKEN is required")
@@ -109,7 +107,6 @@ class Settings:
         return cls(
             slack_app_token=slack_app_token,
             slack_bot_token=slack_bot_token,
-            slack_signing_secret=slack_signing_secret,
             codex_bin=codex_bin,
             codex_args=codex_args,
             codex_timeout_seconds=codex_timeout_seconds,

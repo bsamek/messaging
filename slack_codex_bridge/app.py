@@ -138,7 +138,6 @@ def create_app(
 
     app = App(
         token=loaded_settings.slack_bot_token,
-        signing_secret=loaded_settings.slack_signing_secret or "unused",
     )
 
     def _make_handler(command: str, run_fn: RunFn) -> Callable[..., None]:

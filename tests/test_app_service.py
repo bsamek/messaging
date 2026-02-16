@@ -49,7 +49,6 @@ def _settings(**overrides: Any) -> Settings:
     base = {
         "slack_app_token": "xapp-test",
         "slack_bot_token": "xoxb-test",
-        "slack_signing_secret": "",
         "codex_bin": "codex",
         "codex_args": ("exec",),
         "codex_timeout_seconds": 300,

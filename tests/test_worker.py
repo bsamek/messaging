@@ -5,7 +5,7 @@ import time
 import unittest
 
 from slack_codex_bridge.codex_runner import CodexResult
-from slack_codex_bridge.worker import CodexJob, JobWorker, WorkerMetrics
+from slack_codex_bridge.worker import CodexJob, JobWorker
 
 
 def _ok_result(_: str) -> CodexResult:
@@ -111,22 +111,6 @@ class WorkerQueueDepthTests(unittest.TestCase):
         self.assertEqual(worker.queue_depth(), 1)
 
 
-class WorkerMetricsTests(unittest.TestCase):
-    def test_metrics_returns_copy_of_metrics(self) -> None:
-        worker = JobWorker(
-            run_codex_fn=_ok_result,
-            max_queue_size=10,
-            concurrency=1,
-            max_output_chars=200,
-        )
-        metrics = worker.metrics()
-        self.assertIsInstance(metrics, WorkerMetrics)
-        self.assertEqual(metrics.jobs_received_total, 0)
-        self.assertEqual(metrics.jobs_completed_total, 0)
-        self.assertEqual(metrics.jobs_failed_total, 0)
-        self.assertEqual(metrics.jobs_timeout_total, 0)
-
-
 class WorkerStartStopTests(unittest.TestCase):
     def test_start_is_idempotent(self) -> None:
         worker = JobWorker(
@@ -185,8 +169,6 @@ class WorkerProcessJobTests(unittest.TestCase):
 
         self.assertEqual(len(responses), 1)
         self.assertIn("completed", responses[0])
-        metrics = worker.metrics()
-        self.assertEqual(metrics.jobs_completed_total, 1)
 
     def test_processes_failed_job(self) -> None:
         responses: list[str] = []
@@ -218,10 +200,8 @@ class WorkerProcessJobTests(unittest.TestCase):
 
         self.assertEqual(len(responses), 1)
         self.assertIn("failed", responses[0])
-        metrics = worker.metrics()
-        self.assertEqual(metrics.jobs_failed_total, 1)
 
-    def test_processes_timeout_job_increments_timeout_counter(self) -> None:
+    def test_processes_timeout_job(self) -> None:
         responses: list[str] = []
         done = threading.Event()
 
@@ -250,9 +230,7 @@ class WorkerProcessJobTests(unittest.TestCase):
             worker.stop()
 
         self.assertEqual(len(responses), 1)
-        metrics = worker.metrics()
-        self.assertEqual(metrics.jobs_failed_total, 1)
-        self.assertEqual(metrics.jobs_timeout_total, 1)
+        self.assertIn("failed", responses[0])
 
     def test_job_uses_custom_run_fn(self) -> None:
         responses: list[str] = []
