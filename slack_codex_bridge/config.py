@@ -53,7 +53,7 @@ class Settings:
         *,
         require_slack_tokens: bool = False,
     ) -> Settings:
-        source = env or os.environ
+        source = env if env is not None else os.environ
 
         slack_app_token = source.get("SLACK_APP_TOKEN", "").strip()
         slack_bot_token = source.get("SLACK_BOT_TOKEN", "").strip()
